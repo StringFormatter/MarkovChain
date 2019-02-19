@@ -14,10 +14,10 @@ class MarkovChain(object):
             An array representing the states of the Markov Chain. It
             needs to be in the same order as transition_matrix.
         """
-        self.transition_matrix = np.atleast_2d(tmatrix)
-        self.states = states
-        self.index_dict = {self.states[index]: index for index in range(len(self.states))}
-        self.state_dict = {index: self.states[index] for index in range(len(self.states))}
+        self._transition_matrix = np.atleast_2d(tmatrix)
+        self._states = states
+        self._index_dict = {self._states[index]: index for index in range(len(self._states))}
+        self._state_dict = {index: self._states[index] for index in range(len(self._states))}
 
     def next_state(self, current_state):
         """
@@ -28,8 +28,8 @@ class MarkovChain(object):
             The current state of the system.
         """
         return np.random.choice(
-        self.states, 
-        p=self.transition_matrix[self.index_dict[current_state], :]
+        self._states, 
+        p=self._transition_matrix[self._index_dict[current_state], :]
         )
 
     def generate_states(self, current_state, no=10):
@@ -53,23 +53,23 @@ class MarkovChain(object):
 
 class MarkovFile(object):
     def __init__(self, filename):
-        self.file = open(filename, "r")
-        self.reader = csv.reader(self.file)
+        self._file = open(filename, "r")
+        self._reader = csv.reader(self.file)
 
     def parse(self):
         rnum = 0
         tmpmatrix = []
-        for row in self.reader:
+        for row in self._reader:
             if rnum == 0:
-                self.states = row
+                self._states = row
             else:
                 tmpmatrix.append(list(map(float, row)))
             rnum+=1
-        self.MC = MarkovChain(tmpmatrix, self.states)
+        self._MC = MarkovChain(tmpmatrix, self.states)
 
     def gstates(self, current_state, num=10):
         self.parse()
-        return self.MC.generate_states(current_state, num)
+        return self._MC.generate_states(current_state, num)
 
 pList = [[0, .1, .9],
         [.3, .4, .3],
