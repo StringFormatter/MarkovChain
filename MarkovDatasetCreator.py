@@ -1,111 +1,69 @@
 import os
 import sys
-import pygame
-from ezscroll.ezscroll import *
+from tkinter import *
+from tkinter import ttk
 
-class App:
-    def __init__(self):
-        self._running = True
-        self._display_surf = None
-        self._size = self._width, self._height = 1920, 1080
-        self._size1 = 500, 500
+class MainApp():
 
-    def on_init(self):
-        pygame.init()
-        icon = pygame.image.load("AAMarkovicon.png")
-        pygame.display.set_icon(icon)
-        pygame.display.set_caption("Markov Dataset Creator")
-        group = pygame.sprite.RenderPlain()    
-        self._clock = pygame.time.Clock()
-        self._color_inactive = pygame.Color('lightskyblue3')
-        self._color_active = pygame.Color('dodgerblue2')
-        self._color_red = pygame.Color(120, 0, 0)
-        self._color = pygame.Color('lightskyblue3')
-        #self._display_surf = pygame.display.set_mode(self._size, pygame.HWSURFACE | pygame.DOUBLEBUF)
-        self._display_surf = pygame.display.set_mode(self._size)
-        self._font = pygame.font.Font(None, 32)
-        self._running = True
-        self._scrollspeed = 5
-        self._tactive = False
-        self._text = ''
-        self._textrect = pygame.Rect(10, 50, 790, 1010)
-        self._bubblerect = pygame.Rect(802, 50, 1106, 1010)
-        #self._textwd = pygame.Surface(self._size1)
-        #self._bubblewd = pygame.Surface(self._size1)
-        self._sRect = pygame.Rect(0, 0, 500, 20)
-        self._textbg = pygame.Surface((1920, 1080)).convert()
-
-        self._textsb = ScrollBar(
-            group,
-            790,
-            self._sRect,
-            self._textbg,
-            0,
-            ((0, 20), self._size1),
-            4,
-            True,
-            20,
-            (0, 0, 120),
-            (0, 40, 170),
-            (250, 250, 250),
-            (70, 0, 0))
+    def __init__(self, master):
         
-    def on_event(self, event):
-        self._textsb.update(event)
-        if event.type == pygame.QUIT:
-            self._running = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if self._textrect.collidepoint(event.pos):
-                self._tactive = not self._tactive
-            else:
-                self._tactive = False
-            self._color = self._color_active if self._tactive else self._color_inactive
-        if event.type == pygame.KEYDOWN:
-            if self._tactive:
-                if event.key == pygame.K_RETURN:
-                    self._textrect.top += 10
-                elif event.key == pygame.K_BACKSPACE:
-                    self._text = self._text[:-1]
-                else:
-                    self._text += event.unicode
-            
-    def on_loop(self):
-        pass
-    
-    def on_render(self):
-        self._display_surf.fill((30, 30, 30))
-        self._txt_surface = self._font.render(self._text, True, (255, 255, 255))
-        twidth = 790
-        self._textrect.w = twidth
-        
-        
-        changes = self._textsb.draw(self._textbg)
-        self._display_surf.blit(self._textbg, (20,0),(self._textsb.get_scrolled(), (500-20,20)))
-        self._display_surf.blit(self._txt_surface, (12,52))
-        
-        
-        #self._display_surf.blit(self._txt_surface, (12, 52))
-        pygame.draw.rect(self._display_surf, self._color, pygame.Rect(10, 50, 790, 1010), 2)
-        pygame.draw.rect(self._display_surf, self._color_red, self._bubblerect, 2)
+        self.mWidth = 1200
+        self.mHeight = 800
+        self.nodeList = []
+
+        frame = Frame(master, width=self.mWidth, height=self.mHeight)
+        frame.pack(fill="both", expand=YES)
+
+        self.createWidgets(frame)
 
 
-        pygame.display.flip()
-        self._clock.tick(30)
+        '''self.button = Button(
+            frame, text="QUIT", fg="red", command=frame.quit
+            )
+        self.button.pack(side=TOP)'''
 
-    def on_cleanup(self):
-        pygame.quit()
- 
-    def on_execute(self):
-        if self.on_init() == False:
-            self._running = False
- 
-        while( self._running ):
-            for event in pygame.event.get():
-                self.on_event(event)
-            self.on_loop()
-            self.on_render()
-        self.on_cleanup()
- 
+
+    def createWidgets(self, frame):
+        
+        self.notebook = ttk.Notebook(frame)
+        
+        self.gframe = Frame(self.notebook)
+        self.gtframe = Frame(self.gframe)
+        self.gbframe = Frame(self.gframe)
+        
+        self.gtframe.pack(fill="both", expand=YES)
+        self.gbframe.pack(expand=NO)
+
+        self.canvas = Canvas(self.gtframe, bg = "#1e1e1e")
+
+        self.canvas.pack(fill="both", expand=YES)
+        
+        self.abttn = Button(self.gbframe, text="Add Node", command=self.addNode)
+        self.rbttn = Button(self.gbframe, text="Remove Node", command=self.removeNode)
+        
+        self.abttn.grid(column=0, row=1)
+        self.rbttn.grid(column=1, row=1)
+
+        self.fframe = Frame(self.notebook)
+        self.label = Label(self.fframe, text="WIP please ignore, JUST LEAVE", bg = "#3e3e3e")
+        
+        self.label.grid(column=0, row=0)
+        
+        self.notebook.add(self.gframe, text="Graph")
+        self.notebook.add(self.fframe, text="File Text")
+        
+        self.notebook.pack(fill="both", expand=YES)
+
+    def addNode(self):
+        self.nodeList.append(self.canvas.create_oval(0, 0, 50, 50, outline="#0030e0", activeoutline="#00e0e0", fill="#0030e0", activefill="#00e0e0"))
+
+    def removeNode(self):
+        self.canvas.delete(self.nodeList.pop())
+
+
 if __name__ == "__main__" :
-    MainWin = App()
-    MainWin.on_execute()
+    root = Tk()
+
+    app = MainApp(root)
+
+    root.mainloop()
