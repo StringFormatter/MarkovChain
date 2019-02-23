@@ -10,6 +10,8 @@ class MainApp():
         self.mWidth = 1200
         self.mHeight = 800
         self.nodeList = []
+        self.textList = []
+        self.nodenum = 0
 
         frame = Frame(master, width=self.mWidth, height=self.mHeight)
         frame.pack(fill="both", expand=YES)
@@ -55,10 +57,19 @@ class MainApp():
         self.notebook.pack(fill="both", expand=YES)
 
     def addNode(self):
-        self.nodeList.append(self.canvas.create_oval(0, 0, 50, 50, outline="#0030e0", activeoutline="#00e0e0", fill="#0030e0", activefill="#00e0e0"))
+        self.nodeList.append(self.canvas.create_oval(0, 0, 50, 50, outline="#0030e0", activeoutline="#00e0e0", fill="#0030e0", activefill="#00e0e0", tags=str(self.nodenum)))
+        self.textList.append(self.canvas.create_text(25, 25, tags=str(self.nodenum), text="Test"))
+        self.canvas.tag_bind(ALL, '<1>', func = self.clickmove)
+        self.nodenum += 1
 
     def removeNode(self):
+        if self.nodeList == []: return 0
         self.canvas.delete(self.nodeList.pop())
+        self.canvas.delete(self.textList.pop())
+
+    def clickmove(self, event):
+        self.canvas.move(CURRENT, self.canvas.winfo_pointerx()-self.canvas.winfo_rootx(), self.canvas.winfo_pointery()-self.canvas.winfo_rooty())
+        print(self.canvas.winfo_pointerx()-self.canvas.winfo_rootx())
 
 
 if __name__ == "__main__" :
