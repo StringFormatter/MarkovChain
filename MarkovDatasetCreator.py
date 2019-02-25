@@ -59,7 +59,7 @@ class MainApp():
     def addNode(self):
         self.nodeList.append(self.canvas.create_oval(0, 0, 50, 50, outline="#0030e0", activeoutline="#00e0e0", fill="#0030e0", activefill="#00e0e0", tags=str(self.nodenum)))
         self.textList.append(self.canvas.create_text(25, 25, tags=str(self.nodenum), text="Test"))
-        self.canvas.tag_bind(ALL, '<1>', func = self.clickmove)
+        self.canvas.tag_bind(ALL, '<B1-Motion>', func = self.clickmove)
         self.nodenum += 1
 
     def removeNode(self):
@@ -68,9 +68,17 @@ class MainApp():
         self.canvas.delete(self.textList.pop())
 
     def clickmove(self, event):
-        self.canvas.move(CURRENT, self.canvas.winfo_pointerx()-self.canvas.winfo_rootx(), self.canvas.winfo_pointery()-self.canvas.winfo_rooty())
-        print(self.canvas.winfo_pointerx()-self.canvas.winfo_rootx())
+        mouse_x = self.canvas.winfo_pointerx()-self.canvas.winfo_rootx()
+        mouse_y = self.canvas.winfo_pointery()-self.canvas.winfo_rooty()
+        coords = self.canvas.coords(CURRENT)
+        avgcoord_x = (coords[0]+coords[2])/2
+        avgcoord_y = (coords[1]+coords[3])/2
 
+        self.canvas.move(CURRENT, mouse_x-avgcoord_x, mouse_y-avgcoord_y)
+        self.canvas.move(self.canvas.find_above(CURRENT), mouse_x-avgcoord_x, mouse_y-avgcoord_y)
+
+        #print((mouse_x,mouse_y))
+        #print(coords)
 
 if __name__ == "__main__" :
     root = Tk()
